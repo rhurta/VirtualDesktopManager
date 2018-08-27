@@ -86,6 +86,7 @@ namespace VirtualDesktopManager
 			{
 				var toolStripMenuItemDesktopChild = new ToolStripMenuItem();
 				toolStripMenuItemDesktopChild.Text = string.Format("Desktop {0}", vDesktopNum);
+				toolStripMenuItemDesktopChild.Font = new Font((contextMenuStrip1.Items["desktopsToolStripMenuItem"] as ToolStripMenuItem)?.Font.Name, 9);
 				toolStripMenuItemDesktopChild.Click += ToolStripItem_OnClick;
 				(contextMenuStrip1.Items["desktopsToolStripMenuItem"] as ToolStripMenuItem)?.DropDown.Items.Add(toolStripMenuItemDesktopChild);
 				vDesktopNum++;
@@ -103,6 +104,8 @@ namespace VirtualDesktopManager
 
 		private void Settings_Load(object sender, EventArgs e)
 		{
+			bwCheckVirtualDesktop.RunWorkerAsync();
+
 			labelStatus.Text = "";
 
 			if (!useAltKeySettings)
@@ -337,9 +340,9 @@ namespace VirtualDesktopManager
 
 		private void closeDesktopToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (VirtualDesktop.GetDesktops().Count() > 1)
+			if (VirtualDesktop.GetDesktops().Count() > 0)
 			{
-				if (getCurrentDesktopIndex() > 1)
+				if (getCurrentDesktopIndex() > 0)
 					VirtualDesktop.Current.Remove(VirtualDesktop.Current.GetLeft());
 				else
 					VirtualDesktop.Current.Remove(VirtualDesktop.Current.GetRight());
@@ -403,6 +406,14 @@ namespace VirtualDesktopManager
 		{
 			var ToolStripItem = sender as ToolStripMenuItem;
 			var ToolStripItemIndex = ToolStripItem.GetCurrentParent().Items.IndexOf(ToolStripItem);
+			foreach (ToolStripMenuItem item in ToolStripItem.GetCurrentParent().Items)
+			{
+				if (item != ToolStripItem)
+					item.Checked = false;
+				else
+					item.Checked = true;
+			}
+
 			Console.WriteLine("{0} was clicked, index = {1}", ToolStripItem.Text, ToolStripItemIndex);
 			VirtualDesktop_SwitchByIndex(ToolStripItemIndex);
 		}
@@ -577,6 +588,8 @@ namespace VirtualDesktopManager
 		private void bwCheckVirtualDesktop_ProgressChanged(object sender, ProgressChangedEventArgs e)
 		{
 			PickNthFile(e.ProgressPercentage + 1);
+			ToolStripMenuItem toolStripItemParent = contextMenuStrip1.Items["desktopsToolStripMenuItem"] as ToolStripMenuItem;
+			(toolStripItemParent.DropDownItems[e.ProgressPercentage] as ToolStripMenuItem).Checked = true;
 		}
 
 		// TESTING

@@ -110,7 +110,7 @@
     <Compile Include="Native.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Settings.resx">
+    <EmbeddedResource Include="MenuSettings.resx">
       <DependentUpon>MenuSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

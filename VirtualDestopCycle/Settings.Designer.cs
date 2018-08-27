@@ -29,11 +29,15 @@
         private void InitializeComponent()
         {
 			this.components = new System.ComponentModel.Container();
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Settings));
 			this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.desktopsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.newDesktopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.closeDesktopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -47,11 +51,6 @@
 			this.labelStatus = new System.Windows.Forms.Label();
 			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			this.labelDebug = new System.Windows.Forms.Label();
-			this.newDesktopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.closeDesktopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.desktopsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.contextMenuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -67,7 +66,6 @@
 			// 
 			// contextMenuStrip1
 			// 
-			this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(28, 28);
 			this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.desktopsToolStripMenuItem,
             this.toolStripSeparator1,
@@ -78,14 +76,38 @@
             this.refreshToolStripMenuItem,
             this.exitToolStripMenuItem});
 			this.contextMenuStrip1.Name = "contextMenuStrip1";
-			this.contextMenuStrip1.Size = new System.Drawing.Size(150, 148);
+			this.contextMenuStrip1.Size = new System.Drawing.Size(181, 170);
 			// 
-			// refreshToolStripMenuItem
+			// desktopsToolStripMenuItem
 			// 
-			this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
-			this.refreshToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
-			this.refreshToolStripMenuItem.Text = "Refresh";
-			this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
+			this.desktopsToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.desktopsToolStripMenuItem.Name = "desktopsToolStripMenuItem";
+			this.desktopsToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.desktopsToolStripMenuItem.Text = "Desktops";
+			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(146, 6);
+			// 
+			// newDesktopToolStripMenuItem
+			// 
+			this.newDesktopToolStripMenuItem.Name = "newDesktopToolStripMenuItem";
+			this.newDesktopToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.newDesktopToolStripMenuItem.Text = "New Desktop";
+			this.newDesktopToolStripMenuItem.Click += new System.EventHandler(this.newDesktopToolStripMenuItem_Click);
+			// 
+			// closeDesktopToolStripMenuItem
+			// 
+			this.closeDesktopToolStripMenuItem.Name = "closeDesktopToolStripMenuItem";
+			this.closeDesktopToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.closeDesktopToolStripMenuItem.Text = "Close Desktop";
+			this.closeDesktopToolStripMenuItem.Click += new System.EventHandler(this.closeDesktopToolStripMenuItem_Click);
+			// 
+			// toolStripSeparator2
+			// 
+			this.toolStripSeparator2.Name = "toolStripSeparator2";
+			this.toolStripSeparator2.Size = new System.Drawing.Size(146, 6);
 			// 
 			// settingsToolStripMenuItem
 			// 
@@ -93,6 +115,13 @@
 			this.settingsToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
 			this.settingsToolStripMenuItem.Text = "Settings";
 			this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+			// 
+			// refreshToolStripMenuItem
+			// 
+			this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
+			this.refreshToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.refreshToolStripMenuItem.Text = "Refresh";
+			this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
 			// 
 			// exitToolStripMenuItem
 			// 
@@ -268,36 +297,6 @@
 			this.labelDebug.Text = "debug";
 			this.labelDebug.Click += new System.EventHandler(this.labelDebug_Click);
 			// 
-			// newDesktopToolStripMenuItem
-			// 
-			this.newDesktopToolStripMenuItem.Name = "newDesktopToolStripMenuItem";
-			this.newDesktopToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
-			this.newDesktopToolStripMenuItem.Text = "New Desktop";
-			this.newDesktopToolStripMenuItem.Click += new System.EventHandler(this.newDesktopToolStripMenuItem_Click);
-			// 
-			// closeDesktopToolStripMenuItem
-			// 
-			this.closeDesktopToolStripMenuItem.Name = "closeDesktopToolStripMenuItem";
-			this.closeDesktopToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
-			this.closeDesktopToolStripMenuItem.Text = "Close Desktop";
-			this.closeDesktopToolStripMenuItem.Click += new System.EventHandler(this.closeDesktopToolStripMenuItem_Click);
-			// 
-			// desktopsToolStripMenuItem
-			// 
-			this.desktopsToolStripMenuItem.Name = "desktopsToolStripMenuItem";
-			this.desktopsToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
-			this.desktopsToolStripMenuItem.Text = "Desktops";
-			// 
-			// toolStripSeparator1
-			// 
-			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(146, 6);
-			// 
-			// toolStripSeparator2
-			// 
-			this.toolStripSeparator2.Name = "toolStripSeparator2";
-			this.toolStripSeparator2.Size = new System.Drawing.Size(146, 6);
-			// 
 			// Settings
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -311,7 +310,6 @@
 			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
 			this.ForeColor = System.Drawing.Color.Black;
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Margin = new System.Windows.Forms.Padding(1);
 			this.Name = "Settings";
 			this.ShowIcon = false;
