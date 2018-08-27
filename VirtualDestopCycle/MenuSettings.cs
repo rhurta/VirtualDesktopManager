@@ -587,9 +587,15 @@ namespace VirtualDesktopManager
 
 		private void bwCheckVirtualDesktop_ProgressChanged(object sender, ProgressChangedEventArgs e)
 		{
-			PickNthFile(e.ProgressPercentage + 1);
 			ToolStripMenuItem toolStripItemParent = contextMenuStrip1.Items["desktopsToolStripMenuItem"] as ToolStripMenuItem;
-			(toolStripItemParent.DropDownItems[e.ProgressPercentage] as ToolStripMenuItem).Checked = true;
+			PickNthFile(e.ProgressPercentage + 1);
+			foreach (ToolStripMenuItem item in toolStripItemParent.DropDownItems)
+			{
+				if (item != (toolStripItemParent.DropDownItems[e.ProgressPercentage] as ToolStripMenuItem))
+					item.Checked = false;
+				else
+					item.Checked = true;
+			}
 		}
 
 		// TESTING
@@ -597,7 +603,7 @@ namespace VirtualDesktopManager
 		private void test()
 		{
 
-
+		
 			
 		}
 
