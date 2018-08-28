@@ -8,7 +8,7 @@ Install
 ------------------------
 There is no installation. Just download the .zip from the Releases, extract it and then run VirtualDesktopManager.exe.
 
-</s>You can use Task Scheduler to make it launch when you login so you don't have to launch it manually every reboot.</s>
+* </s>You can use Task Scheduler to make it launch when you login so you don't have to launch it manually every reboot.</s>
 Check the **Automatic Startup** CheckBox in the settings and click **Save**
 
 Usage
