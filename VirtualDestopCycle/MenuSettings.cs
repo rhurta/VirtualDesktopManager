@@ -451,7 +451,7 @@ namespace VirtualDesktopManager
 			}
 
 			desktops.ElementAt(index)?.Switch();
-
+            ShowSplashVirtualDesktopSplashScreen();
 		}
 
 		private void RegisterNumberHotkeys(ModifierKeys modifiers)
@@ -597,7 +597,7 @@ namespace VirtualDesktopManager
         {
 
             Font fontCurrentDesktop = new Font("Roboto", 24);
-            Font fontCurrentDesktopIndex = new Font("Roboto", 48);
+            Font fontCurrentDesktopIndex = new Font("Roboto", 72);
 
             Label labelCurrentDesktop = new Label();
             labelCurrentDesktop.Text = string.Format("Current Desktop");
@@ -666,7 +666,7 @@ namespace VirtualDesktopManager
         private void bwSplashTimer_DoWork(object sender, DoWorkEventArgs e)
         {
 
-            int splashScreenInterval = 2000;
+            int splashScreenInterval = 1750;
             int sleepTimer = 10;
             Console.WriteLine("timer started");
             Timers.Timer r = new Timers.Timer();
