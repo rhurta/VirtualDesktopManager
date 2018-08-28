@@ -12,6 +12,7 @@ using System.Threading;
 using System.ComponentModel;
 using Timers = System.Timers;
 
+
 namespace VirtualDesktopManager
 {
     public partial class Settings : Form
@@ -29,7 +30,18 @@ namespace VirtualDesktopManager
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         extern static bool DestroyIcon(IntPtr handle);
 
-        private HotKeyManager _rightHotkey;
+		[DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
+		private static extern IntPtr CreateRoundRectRgn
+		(
+			int nLeftRect,     // x-coordinate of upper-left corner
+			int nTopRect,      // y-coordinate of upper-left corner
+			int nRightRect,    // x-coordinate of lower-right corner
+			int nBottomRect,   // y-coordinate of lower-right corner
+			int nWidthEllipse, // height of ellipse
+			int nHeightEllipse // width of ellipse
+		);
+
+		private HotKeyManager _rightHotkey;
         private HotKeyManager _leftHotkey;
         private HotKeyManager _numberHotkey;
 
@@ -65,10 +77,12 @@ namespace VirtualDesktopManager
 			VirtualDesktop.Created += VirtualDesktop_Added;
 			VirtualDesktop.Destroyed += VirtualDesktop_Destroyed;
 
-			this.FormClosing += Form1_FormClosing;
+			this.FormClosing += MenuSettings_FormClosing;
 
 			useAltKeySettings = Properties.Settings.Default.AltHotKey;
 			checkBox1.Checked = useAltKeySettings;
+
+			checkBoxStartup.Checked = Properties.Settings.Default.ApplicationStartup;
 
 			listView1.Items.Clear();
 			listView1.Columns.Add("File").Width = 400;
@@ -100,17 +114,19 @@ namespace VirtualDesktopManager
 		{
 			bwCheckVirtualDesktop.DoWork += bwCheckVirtualDesktop_DoWork;
 			bwCheckVirtualDesktop.ProgressChanged += bwCheckVirtualDesktop_ProgressChanged;
+			bwCheckVirtualDesktop.WorkerSupportsCancellation = true;
 			bwCheckVirtualDesktop.WorkerReportsProgress = true;
 
             bwSplashTimer.DoWork += bwSplashTimer_DoWork;
             bwSplashTimer.ProgressChanged += bwSplashTimer_ProgressChanged;
             bwSplashTimer.RunWorkerCompleted += bwSplashTimer_WorkerCompleted;
+			bwSplashTimer.WorkerSupportsCancellation = true;
             bwSplashTimer.WorkerReportsProgress = true;
 		}
 
 		// MAIN FORM
 
-		private void Settings_Load(object sender, EventArgs e)
+		private void MenuSettings_Load(object sender, EventArgs e)
 		{
 			bwCheckVirtualDesktop.RunWorkerAsync();
 
@@ -126,7 +142,7 @@ namespace VirtualDesktopManager
             this.Visible = false;
 		}
 
-		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+		private void MenuSettings_FormClosing(object sender, FormClosingEventArgs e)
 		{
 			if (closeToTray)
 			{
@@ -222,6 +238,30 @@ namespace VirtualDesktopManager
 				Properties.Settings.Default.AltHotKey = false;
 			}
 
+			if (checkBoxStartup.Checked)
+			{
+				string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+
+				using (StreamWriter writer = new StreamWriter(deskDir + "\\" + "VirtualDesktopManager" + ".url"))
+				{
+					string app = System.Reflection.Assembly.GetExecutingAssembly().Location;
+					writer.WriteLine("[InternetShortcut]");
+					writer.WriteLine("URL=file:///" + app);
+					writer.WriteLine("IconIndex=0");
+					string icon = app.Replace('\\', '/');
+					writer.WriteLine("IconFile=" + icon);
+					writer.Flush();
+				}
+				Properties.Settings.Default.ApplicationStartup = true;
+			}
+			else
+			{
+				string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+				if (File.Exists(deskDir + "\\VirtualDesktopManager.url"))
+					File.Delete(deskDir + "\\VirtualDesktopManager.url");
+				Properties.Settings.Default.ApplicationStartup = false;
+			}
+
 			Properties.Settings.Default.DesktopBackgroundFiles.Clear();
 			foreach (ListViewItem item in listView1.Items)
 			{
@@ -284,7 +324,7 @@ namespace VirtualDesktopManager
 
 			InitializeVariables();
 			InitializeToolStripItems();
-
+			PickNthFile(getCurrentDesktopIndex());
 		}
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -292,6 +332,11 @@ namespace VirtualDesktopManager
 			_rightHotkey.Dispose();
 			_leftHotkey.Dispose();
 			_numberHotkey.Dispose();
+
+			bwCheckVirtualDesktop.CancelAsync();
+			bwSplashTimer.CancelAsync();
+			bwCheckVirtualDesktop.Dispose();
+			bwSplashTimer.Dispose();
 
 			closeToTray = false;
 
@@ -343,11 +388,13 @@ namespace VirtualDesktopManager
 			VirtualDesktop.Create();
 			InitializeVariables();
 			InitializeToolStripItems();
+			VirtualDesktop.GetDesktops()[VirtualDesktop.GetDesktops().Count() - 1].Switch();
+			ShowSplashVirtualDesktopSplashScreen();
 		}
 
 		private void closeDesktopToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (VirtualDesktop.GetDesktops().Count() > 0)
+			if (VirtualDesktop.GetDesktops().Count() > 1)
 			{
 				if (getCurrentDesktopIndex() > 0)
 					VirtualDesktop.Current.Remove(VirtualDesktop.Current.GetLeft());
@@ -393,7 +440,15 @@ namespace VirtualDesktopManager
 
             restoreApplicationFocus(currentDesktopIndex);
             changeTrayIcon(currentDesktopIndex);
-        }
+		}
+
+		private void ShowDesktopSwitchedNotification()
+		{
+			
+			notifyIcon1.BalloonTipTitle = "Desktop Switched";
+			notifyIcon1.BalloonTipText = string.Format("Current Desktop is {0}", (getCurrentDesktopIndex() + 1));
+			notifyIcon1.ShowBalloonTip(0);
+		}
 
 		private void VirtualDesktop_Shortcuts()
 		{
@@ -403,8 +458,16 @@ namespace VirtualDesktopManager
 		private void VirtualDesktop_SwitchByIndex(int idDesktop)
 		{
 			// Author: rootwo62
-			VirtualDesktop[] vDesktops = VirtualDesktop.GetDesktops();
-			vDesktops[idDesktop].Switch();
+			try
+			{
+				VirtualDesktop[] vDesktops = VirtualDesktop.GetDesktops();
+				vDesktops[idDesktop].Switch();
+			}
+			catch (Exception err)
+			{
+				Console.Write("[ERROR SWITCHING DESKTOPS] {0}", err.Message);
+			}
+
 		}
 
 		// EVENT HANDLERS
@@ -451,7 +514,7 @@ namespace VirtualDesktopManager
 			}
 
 			desktops.ElementAt(index)?.Switch();
-            ShowSplashVirtualDesktopSplashScreen();
+			ShowSplashVirtualDesktopSplashScreen();
 		}
 
 		private void RegisterNumberHotkeys(ModifierKeys modifiers)
@@ -477,9 +540,10 @@ namespace VirtualDesktopManager
 			}
 			catch (Exception err)
 			{
-				notifyIcon1.BalloonTipTitle = "Error setting hotkeys";
-				notifyIcon1.BalloonTipText = "Could not set hotkeys. Please open settings and try the alternate combination.";
-				notifyIcon1.ShowBalloonTip(2000);
+				Console.WriteLine("[HOTKEY ERROR] {0}", err.Message);
+				//notifyIcon1.BalloonTipTitle = "Error setting hotkeys";
+				//notifyIcon1.BalloonTipText = "Could not set hotkeys. Please open settings and try the alternate combination.";
+				//notifyIcon1.ShowBalloonTip(2000);
 			}
 		}
 
@@ -493,9 +557,10 @@ namespace VirtualDesktopManager
 			}
 			catch (Exception err)
 			{
-				notifyIcon1.BalloonTipTitle = "Error setting hotkeys";
-				notifyIcon1.BalloonTipText = "Could not set hotkeys. Please open settings and try the default combination.";
-				notifyIcon1.ShowBalloonTip(2000);
+				Console.WriteLine("[HOTKEY ERROR] {0}", err.Message);
+				//notifyIcon1.BalloonTipTitle = "Error setting hotkeys";
+				//notifyIcon1.BalloonTipText = "Could not set hotkeys. Please open settings and try the default combination.";
+				//notifyIcon1.ShowBalloonTip(2000);
 			}
 		}
 
@@ -566,20 +631,6 @@ namespace VirtualDesktopManager
 			}
 		}
 
-        Form CurrentVirtualDesktopSplashScreen;
-
-        private void ShowSplashVirtualDesktopSplashScreen()
-        {
-            if (CurrentVirtualDesktopSplashScreen == null)
-            {
-                CurrentVirtualDesktopSplashScreen = currentVirtualDesktop(getCurrentDesktopIndex());
-                CurrentVirtualDesktopSplashScreen.Focus();
-                //VirtualDesktop.PinWindow(Process.GetCurrentProcess().Handle);
-                CurrentVirtualDesktopSplashScreen.Show();
-                bwSplashTimer.RunWorkerAsync();
-            }
-        }
-
         // FUNCTIONS
 
         private static ListViewItem NewListViewItem(string file)
@@ -593,14 +644,16 @@ namespace VirtualDesktopManager
 			};
 		}
 
-        Form currentVirtualDesktop(int vDesktopIndexx)
+		Form CurrentVirtualDesktopSplashScreen;
+
+		Form currentVirtualDesktop(int vDesktopIndexx)
         {
 
-            Font fontCurrentDesktop = new Font("Roboto", 24);
-            Font fontCurrentDesktopIndex = new Font("Roboto", 72);
+            Font fontCurrentDesktop = new Font("Roboto", 24, FontStyle.Bold);
+            Font fontCurrentDesktopIndex = new Font("Roboto", 128, FontStyle.Bold);
 
             Label labelCurrentDesktop = new Label();
-            labelCurrentDesktop.Text = string.Format("Current Desktop");
+            labelCurrentDesktop.Text = string.Format("Desktop");
             labelCurrentDesktop.Font = fontCurrentDesktop;
             labelCurrentDesktop.TextAlign = ContentAlignment.MiddleCenter;
             labelCurrentDesktop.AutoSize = false;
@@ -613,7 +666,7 @@ namespace VirtualDesktopManager
             labelCurrentDesktopIndex.Font = fontCurrentDesktopIndex;
             labelCurrentDesktopIndex.TextAlign = ContentAlignment.MiddleCenter;
             labelCurrentDesktopIndex.AutoSize = false;
-            labelCurrentDesktopIndex.ForeColor = Color.White;
+			labelCurrentDesktopIndex.ForeColor = Color.White;
             labelCurrentDesktopIndex.Dock = DockStyle.Fill;
 
             Panel body = new Panel();
@@ -621,17 +674,30 @@ namespace VirtualDesktopManager
             body.Controls.Add(labelCurrentDesktopIndex);
             body.Dock = DockStyle.Fill;
 
-            Form form = new Form();
+			Form form = new Form();
             form.StartPosition = FormStartPosition.CenterScreen;
             form.Controls.Add(body);
             form.FormBorderStyle = FormBorderStyle.None;
-            form.BackColor = Color.SlateGray;
+			form.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, form.Width, form.Height, 20, 20));
+			form.BackColor = ColorTranslator.FromHtml("#212121");
             form.Opacity = .5;
+			form.ShowInTaskbar = false;
             form.TopMost = true;
             return form;
         }
 
-        private int getCurrentDesktopIndex()
+		private void ShowSplashVirtualDesktopSplashScreen()
+		{
+			if (CurrentVirtualDesktopSplashScreen == null)
+			{
+				CurrentVirtualDesktopSplashScreen = currentVirtualDesktop(getCurrentDesktopIndex());
+				CurrentVirtualDesktopSplashScreen.Focus();
+				CurrentVirtualDesktopSplashScreen.Show();
+				bwSplashTimer.RunWorkerAsync();
+			}
+		}
+
+		private int getCurrentDesktopIndex()
 		{
 			return desktops.IndexOf(VirtualDesktop.Current);
 		}
@@ -651,13 +717,22 @@ namespace VirtualDesktopManager
 
 		private void bwCheckVirtualDesktop_ProgressChanged(object sender, ProgressChangedEventArgs e)
 		{
+			try
+			{
 			ToolStripMenuItem toolStripItemParent = contextMenuStrip1.Items["desktopsToolStripMenuItem"] as ToolStripMenuItem;
 			foreach (ToolStripMenuItem item in toolStripItemParent.DropDownItems)
 			{
-				if (item != (toolStripItemParent.DropDownItems[e.ProgressPercentage] as ToolStripMenuItem))
-					item.Checked = false;
-				else
-					item.Checked = true;
+				
+					if (item != (toolStripItemParent.DropDownItems[e.ProgressPercentage] as ToolStripMenuItem))
+						item.Checked = false;
+					else
+						item.Checked = true;
+				}
+			}
+			catch (Exception err)
+			{
+
+				Console.WriteLine("[ERROR] {0}", err.Message);
 			}
 		}
 
@@ -665,7 +740,6 @@ namespace VirtualDesktopManager
 
         private void bwSplashTimer_DoWork(object sender, DoWorkEventArgs e)
         {
-
             int splashScreenInterval = 1750;
             int sleepTimer = 10;
             Console.WriteLine("timer started");
@@ -677,15 +751,14 @@ namespace VirtualDesktopManager
 
             while (i > 0)
             {
-                Thread.Sleep(sleepTimer);
-                i =  i - sleepTimer;
-                bwSplashTimer.ReportProgress(i);
+				Thread.Sleep(sleepTimer);
+				i -= sleepTimer;
+				bwSplashTimer.ReportProgress(i);
             }
         }
 
         private void bwSplashTimer_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            //Console.WriteLine(e.ProgressPercentage);
             double opacitylevel = ((double)e.ProgressPercentage / 1000);
             Console.WriteLine(opacitylevel);
             CurrentVirtualDesktopSplashScreen.Opacity = opacitylevel;
