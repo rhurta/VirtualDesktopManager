@@ -324,7 +324,7 @@ namespace VirtualDesktopManager
 
 			InitializeVariables();
 			InitializeToolStripItems();
-
+			PickNthFile(getCurrentDesktopIndex());
 		}
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
