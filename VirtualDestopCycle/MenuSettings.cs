@@ -338,8 +338,6 @@ namespace VirtualDesktopManager
 			bwCheckVirtualDesktop.Dispose();
 			bwSplashTimer.Dispose();
 
-			CurrentVirtualDesktopSplashScreen.Dispose();
-
 			closeToTray = false;
 
 			this.Close();
