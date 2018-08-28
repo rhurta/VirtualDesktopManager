@@ -114,6 +114,7 @@ namespace VirtualDesktopManager
 		{
 			bwCheckVirtualDesktop.DoWork += bwCheckVirtualDesktop_DoWork;
 			bwCheckVirtualDesktop.ProgressChanged += bwCheckVirtualDesktop_ProgressChanged;
+			bwCheckVirtualDesktop.WorkerSupportsCancellation = true;
 			bwCheckVirtualDesktop.WorkerReportsProgress = true;
 
             bwSplashTimer.DoWork += bwSplashTimer_DoWork;
@@ -332,6 +333,13 @@ namespace VirtualDesktopManager
 			_leftHotkey.Dispose();
 			_numberHotkey.Dispose();
 
+			bwCheckVirtualDesktop.CancelAsync();
+			bwSplashTimer.CancelAsync();
+			bwCheckVirtualDesktop.Dispose();
+			bwSplashTimer.Dispose();
+
+			CurrentVirtualDesktopSplashScreen.Dispose();
+
 			closeToTray = false;
 
 			this.Close();
@@ -382,12 +390,13 @@ namespace VirtualDesktopManager
 			VirtualDesktop.Create();
 			InitializeVariables();
 			InitializeToolStripItems();
-			VirtualDesktop.Current.GetRight().Switch();
+			VirtualDesktop.GetDesktops()[VirtualDesktop.GetDesktops().Count() - 1].Switch();
+			ShowSplashVirtualDesktopSplashScreen();
 		}
 
 		private void closeDesktopToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (VirtualDesktop.GetDesktops().Count() > 0)
+			if (VirtualDesktop.GetDesktops().Count() > 1)
 			{
 				if (getCurrentDesktopIndex() > 0)
 					VirtualDesktop.Current.Remove(VirtualDesktop.Current.GetLeft());
@@ -451,8 +460,16 @@ namespace VirtualDesktopManager
 		private void VirtualDesktop_SwitchByIndex(int idDesktop)
 		{
 			// Author: rootwo62
-			VirtualDesktop[] vDesktops = VirtualDesktop.GetDesktops();
-			vDesktops[idDesktop].Switch();
+			try
+			{
+				VirtualDesktop[] vDesktops = VirtualDesktop.GetDesktops();
+				vDesktops[idDesktop].Switch();
+			}
+			catch (Exception err)
+			{
+				Console.Write("[ERROR SWITCHING DESKTOPS] {0}", err.Message);
+			}
+
 		}
 
 		// EVENT HANDLERS
@@ -525,9 +542,10 @@ namespace VirtualDesktopManager
 			}
 			catch (Exception err)
 			{
-				notifyIcon1.BalloonTipTitle = "Error setting hotkeys";
-				notifyIcon1.BalloonTipText = "Could not set hotkeys. Please open settings and try the alternate combination.";
-				notifyIcon1.ShowBalloonTip(2000);
+				Console.WriteLine("[HOTKEY ERROR] {0}", err.Message);
+				//notifyIcon1.BalloonTipTitle = "Error setting hotkeys";
+				//notifyIcon1.BalloonTipText = "Could not set hotkeys. Please open settings and try the alternate combination.";
+				//notifyIcon1.ShowBalloonTip(2000);
 			}
 		}
 
@@ -541,9 +559,10 @@ namespace VirtualDesktopManager
 			}
 			catch (Exception err)
 			{
-				notifyIcon1.BalloonTipTitle = "Error setting hotkeys";
-				notifyIcon1.BalloonTipText = "Could not set hotkeys. Please open settings and try the default combination.";
-				notifyIcon1.ShowBalloonTip(2000);
+				Console.WriteLine("[HOTKEY ERROR] {0}", err.Message);
+				//notifyIcon1.BalloonTipTitle = "Error setting hotkeys";
+				//notifyIcon1.BalloonTipText = "Could not set hotkeys. Please open settings and try the default combination.";
+				//notifyIcon1.ShowBalloonTip(2000);
 			}
 		}
 
@@ -664,6 +683,7 @@ namespace VirtualDesktopManager
 			form.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, form.Width, form.Height, 20, 20));
 			form.BackColor = ColorTranslator.FromHtml("#212121");
             form.Opacity = .5;
+			form.ShowInTaskbar = false;
             form.TopMost = true;
             return form;
         }
@@ -699,13 +719,22 @@ namespace VirtualDesktopManager
 
 		private void bwCheckVirtualDesktop_ProgressChanged(object sender, ProgressChangedEventArgs e)
 		{
+			try
+			{
 			ToolStripMenuItem toolStripItemParent = contextMenuStrip1.Items["desktopsToolStripMenuItem"] as ToolStripMenuItem;
 			foreach (ToolStripMenuItem item in toolStripItemParent.DropDownItems)
 			{
-				if (item != (toolStripItemParent.DropDownItems[e.ProgressPercentage] as ToolStripMenuItem))
-					item.Checked = false;
-				else
-					item.Checked = true;
+				
+					if (item != (toolStripItemParent.DropDownItems[e.ProgressPercentage] as ToolStripMenuItem))
+						item.Checked = false;
+					else
+						item.Checked = true;
+				}
+			}
+			catch (Exception err)
+			{
+
+				Console.WriteLine("[ERROR] {0}", err.Message);
 			}
 		}
 
