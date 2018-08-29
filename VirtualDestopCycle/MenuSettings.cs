@@ -646,7 +646,7 @@ namespace VirtualDesktopManager
 
 		Form CurrentVirtualDesktopSplashScreen;
 
-		Form currentVirtualDesktop(int vDesktopIndexx)
+		Form currentVirtualDesktop(int vDesktopIndex)
         {
 
             Font fontCurrentDesktop = new Font("Roboto", 24, FontStyle.Bold);
@@ -662,7 +662,7 @@ namespace VirtualDesktopManager
             labelCurrentDesktop.Dock = DockStyle.Top;
 
             Label labelCurrentDesktopIndex = new Label();
-            labelCurrentDesktopIndex.Text = (vDesktopIndexx + 1).ToString();
+            labelCurrentDesktopIndex.Text = (vDesktopIndex + 1).ToString();
             labelCurrentDesktopIndex.Font = fontCurrentDesktopIndex;
             labelCurrentDesktopIndex.TextAlign = ContentAlignment.MiddleCenter;
             labelCurrentDesktopIndex.AutoSize = false;
