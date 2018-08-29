@@ -48,6 +48,9 @@ namespace VirtualDesktopManager
         private bool closeToTray;
         private bool useAltKeySettings;
 
+		private bool HideDesktopSplash;
+
+
         // APP STARTUP
 
         public Settings()
@@ -82,7 +85,8 @@ namespace VirtualDesktopManager
 			useAltKeySettings = Properties.Settings.Default.AltHotKey;
 			checkBox1.Checked = useAltKeySettings;
 
-			checkBoxStartup.Checked = Properties.Settings.Default.ApplicationStartup;
+			checkBoxAutomaticStartup.Checked = Properties.Settings.Default.ApplicationStartup;
+			checkBoxShowDesktopSplash.Checked = Properties.Settings.Default.HideDesktopSplash;
 
 			listView1.Items.Clear();
 			listView1.Columns.Add("File").Width = 400;
@@ -238,7 +242,7 @@ namespace VirtualDesktopManager
 				Properties.Settings.Default.AltHotKey = false;
 			}
 
-			if (checkBoxStartup.Checked)
+			if (checkBoxAutomaticStartup.Checked)
 			{
 				string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
 
@@ -260,6 +264,17 @@ namespace VirtualDesktopManager
 				if (File.Exists(deskDir + "\\VirtualDesktopManager.url"))
 					File.Delete(deskDir + "\\VirtualDesktopManager.url");
 				Properties.Settings.Default.ApplicationStartup = false;
+			}
+
+			if (checkBoxShowDesktopSplash.Checked)
+			{
+				Properties.Settings.Default.HideDesktopSplash = true;
+				HideDesktopSplash = Properties.Settings.Default.HideDesktopSplash;
+			}
+			else
+			{
+				Properties.Settings.Default.HideDesktopSplash = false;
+				HideDesktopSplash = Properties.Settings.Default.HideDesktopSplash;
 			}
 
 			Properties.Settings.Default.DesktopBackgroundFiles.Clear();
@@ -661,22 +676,29 @@ namespace VirtualDesktopManager
             labelCurrentDesktop.ForeColor = Color.White;
             labelCurrentDesktop.Dock = DockStyle.Top;
 
-            Label labelCurrentDesktopIndex = new Label();
-            labelCurrentDesktopIndex.Text = (vDesktopIndex + 1).ToString();
+
+			Label labelCurrentDesktopIndex = new Label();
+            labelCurrentDesktopIndex.Text = (vDesktopIndex + 1).ToString().Trim();
             labelCurrentDesktopIndex.Font = fontCurrentDesktopIndex;
             labelCurrentDesktopIndex.TextAlign = ContentAlignment.MiddleCenter;
             labelCurrentDesktopIndex.AutoSize = false;
 			labelCurrentDesktopIndex.ForeColor = Color.White;
             labelCurrentDesktopIndex.Dock = DockStyle.Fill;
 
-            Panel body = new Panel();
-            body.Controls.Add(labelCurrentDesktop);
-            body.Controls.Add(labelCurrentDesktopIndex);
-            body.Dock = DockStyle.Fill;
+
+			TableLayoutPanel tpanel = new TableLayoutPanel();
+			tpanel.ColumnCount = 1;
+			tpanel.RowCount = 2;
+			tpanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+			tpanel.RowStyles.Add(new RowStyle(SizeType.Percent, 15F));
+			tpanel.RowStyles.Add(new RowStyle(SizeType.Percent, 75F));
+			tpanel.Controls.Add(labelCurrentDesktop);
+			tpanel.Controls.Add(labelCurrentDesktopIndex);
+			tpanel.Dock = DockStyle.Fill;
 
 			Form form = new Form();
             form.StartPosition = FormStartPosition.CenterScreen;
-            form.Controls.Add(body);
+            form.Controls.Add(tpanel);
             form.FormBorderStyle = FormBorderStyle.None;
 			form.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, form.Width, form.Height, 20, 20));
 			form.BackColor = ColorTranslator.FromHtml("#212121");
@@ -688,12 +710,15 @@ namespace VirtualDesktopManager
 
 		private void ShowSplashVirtualDesktopSplashScreen()
 		{
-			if (CurrentVirtualDesktopSplashScreen == null)
+			if (!HideDesktopSplash)
 			{
-				CurrentVirtualDesktopSplashScreen = currentVirtualDesktop(getCurrentDesktopIndex());
-				CurrentVirtualDesktopSplashScreen.Focus();
-				CurrentVirtualDesktopSplashScreen.Show();
-				bwSplashTimer.RunWorkerAsync();
+				if (CurrentVirtualDesktopSplashScreen == null)
+				{
+					CurrentVirtualDesktopSplashScreen = currentVirtualDesktop(getCurrentDesktopIndex());
+					CurrentVirtualDesktopSplashScreen.Focus();
+					CurrentVirtualDesktopSplashScreen.Show();
+					bwSplashTimer.RunWorkerAsync();
+				}
 			}
 		}
 

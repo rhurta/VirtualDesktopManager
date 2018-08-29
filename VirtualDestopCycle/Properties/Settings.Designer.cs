@@ -59,5 +59,17 @@ namespace VirtualDesktopManager.Properties {
                 this["ApplicationStartup"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HideDesktopSplash {
+            get {
+                return ((bool)(this["HideDesktopSplash"]));
+            }
+            set {
+                this["HideDesktopSplash"] = value;
+            }
+        }
     }
 }
