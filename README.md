@@ -31,4 +31,5 @@ Known Issues
 -
 * Splash screen does not show when using windows shortcuts
 * Splash screen must dissapear before showing on another desktop
+* Splash screen number is off center
 * Fonts are not staying constant between builds
