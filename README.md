@@ -10,7 +10,7 @@ I will try to provide a ZIP with the latest build everytime I push.
 
 Fork Changes
 -
-* Check the **Automatic Startup** CheckBox in the settings and click **Save**
+* **Automatic Startup** CheckBox added in the **Settings**
 * Added a splash screen that shows when switching desktops
   * This does not work with windows shortcuts, only application shortcuts
 * Added additional context menu items.
