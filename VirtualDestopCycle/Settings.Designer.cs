@@ -39,8 +39,9 @@
 			this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.checkBox1 = new System.Windows.Forms.CheckBox();
+			this.checkBoxAlternateKeys = new System.Windows.Forms.CheckBox();
 			this.groupBoxSettings = new System.Windows.Forms.GroupBox();
+			this.checkBoxHideDesktopSplash = new System.Windows.Forms.CheckBox();
 			this.removeButton = new System.Windows.Forms.Button();
 			this.downButton = new System.Windows.Forms.Button();
 			this.labelStatus = new System.Windows.Forms.Label();
@@ -66,7 +67,7 @@
 			this.label3 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
-			this.checkBoxShowDesktopSplash = new System.Windows.Forms.CheckBox();
+			this.checkBoxHideNotifications = new System.Windows.Forms.CheckBox();
 			this.contextMenuStrip1.SuspendLayout();
 			this.groupBoxSettings.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -148,24 +149,25 @@
 			this.exitToolStripMenuItem.Text = "Exit";
 			this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
 			// 
-			// checkBox1
+			// checkBoxAlternateKeys
 			// 
-			this.checkBox1.AutoSize = true;
-			this.checkBox1.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.checkBox1.ForeColor = System.Drawing.Color.Black;
-			this.checkBox1.Location = new System.Drawing.Point(9, 39);
-			this.checkBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-			this.checkBox1.Name = "checkBox1";
-			this.checkBox1.Size = new System.Drawing.Size(322, 19);
-			this.checkBox1.TabIndex = 1;
-			this.checkBox1.Text = "Use alternate key combination (Shift+Alt+Left/Right)";
-			this.checkBox1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			this.checkBox1.UseVisualStyleBackColor = true;
+			this.checkBoxAlternateKeys.AutoSize = true;
+			this.checkBoxAlternateKeys.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.checkBoxAlternateKeys.ForeColor = System.Drawing.Color.Black;
+			this.checkBoxAlternateKeys.Location = new System.Drawing.Point(9, 39);
+			this.checkBoxAlternateKeys.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+			this.checkBoxAlternateKeys.Name = "checkBoxAlternateKeys";
+			this.checkBoxAlternateKeys.Size = new System.Drawing.Size(322, 19);
+			this.checkBoxAlternateKeys.TabIndex = 1;
+			this.checkBoxAlternateKeys.Text = "Use alternate key combination (Shift+Alt+Left/Right)";
+			this.checkBoxAlternateKeys.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.checkBoxAlternateKeys.UseVisualStyleBackColor = true;
 			// 
 			// groupBoxSettings
 			// 
 			this.groupBoxSettings.BackColor = System.Drawing.Color.White;
-			this.groupBoxSettings.Controls.Add(this.checkBoxShowDesktopSplash);
+			this.groupBoxSettings.Controls.Add(this.checkBoxHideNotifications);
+			this.groupBoxSettings.Controls.Add(this.checkBoxHideDesktopSplash);
 			this.groupBoxSettings.Controls.Add(this.removeButton);
 			this.groupBoxSettings.Controls.Add(this.downButton);
 			this.groupBoxSettings.Controls.Add(this.labelStatus);
@@ -175,7 +177,7 @@
 			this.groupBoxSettings.Controls.Add(this.checkBoxAutomaticStartup);
 			this.groupBoxSettings.Controls.Add(this.listView1);
 			this.groupBoxSettings.Controls.Add(this.addFileButton);
-			this.groupBoxSettings.Controls.Add(this.checkBox1);
+			this.groupBoxSettings.Controls.Add(this.checkBoxAlternateKeys);
 			this.groupBoxSettings.Font = new System.Drawing.Font("Roboto", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.groupBoxSettings.ForeColor = System.Drawing.Color.Black;
 			this.groupBoxSettings.Location = new System.Drawing.Point(8, 9);
@@ -187,13 +189,24 @@
 			this.groupBoxSettings.TabStop = false;
 			this.groupBoxSettings.Text = "Settings";
 			// 
+			// checkBoxHideDesktopSplash
+			// 
+			this.checkBoxHideDesktopSplash.AutoSize = true;
+			this.checkBoxHideDesktopSplash.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.checkBoxHideDesktopSplash.Location = new System.Drawing.Point(9, 89);
+			this.checkBoxHideDesktopSplash.Name = "checkBoxHideDesktopSplash";
+			this.checkBoxHideDesktopSplash.Size = new System.Drawing.Size(151, 19);
+			this.checkBoxHideDesktopSplash.TabIndex = 9;
+			this.checkBoxHideDesktopSplash.Text = "Hide Desktop Splash?";
+			this.checkBoxHideDesktopSplash.UseVisualStyleBackColor = true;
+			// 
 			// removeButton
 			// 
 			this.removeButton.BackColor = System.Drawing.SystemColors.HotTrack;
 			this.removeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.removeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.removeButton.ForeColor = System.Drawing.Color.White;
-			this.removeButton.Location = new System.Drawing.Point(224, 201);
+			this.removeButton.Location = new System.Drawing.Point(236, 219);
 			this.removeButton.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.removeButton.Name = "removeButton";
 			this.removeButton.Size = new System.Drawing.Size(144, 37);
@@ -208,7 +221,7 @@
 			this.downButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.downButton.Font = new System.Drawing.Font("Wingdings", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
 			this.downButton.ForeColor = System.Drawing.Color.White;
-			this.downButton.Location = new System.Drawing.Point(533, 158);
+			this.downButton.Location = new System.Drawing.Point(533, 176);
 			this.downButton.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.downButton.Name = "downButton";
 			this.downButton.Size = new System.Drawing.Size(41, 37);
@@ -232,7 +245,7 @@
 			this.upButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.upButton.Font = new System.Drawing.Font("Wingdings", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
 			this.upButton.ForeColor = System.Drawing.Color.White;
-			this.upButton.Location = new System.Drawing.Point(533, 98);
+			this.upButton.Location = new System.Drawing.Point(533, 139);
 			this.upButton.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.upButton.Name = "upButton";
 			this.upButton.Size = new System.Drawing.Size(41, 37);
@@ -258,10 +271,10 @@
 			// 
 			// pictureBox1
 			// 
-			this.pictureBox1.Location = new System.Drawing.Point(8, 246);
+			this.pictureBox1.Location = new System.Drawing.Point(8, 219);
 			this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(171, 76);
+			this.pictureBox1.Size = new System.Drawing.Size(223, 103);
 			this.pictureBox1.TabIndex = 4;
 			this.pictureBox1.TabStop = false;
 			// 
@@ -280,11 +293,11 @@
 			// 
 			this.listView1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.listView1.HideSelection = false;
-			this.listView1.Location = new System.Drawing.Point(8, 98);
+			this.listView1.Location = new System.Drawing.Point(8, 139);
 			this.listView1.Name = "listView1";
 			this.listView1.ShowGroups = false;
 			this.listView1.ShowItemToolTips = true;
-			this.listView1.Size = new System.Drawing.Size(508, 97);
+			this.listView1.Size = new System.Drawing.Size(520, 74);
 			this.listView1.TabIndex = 4;
 			this.listView1.UseCompatibleStateImageBehavior = false;
 			this.listView1.View = System.Windows.Forms.View.Details;
@@ -295,7 +308,7 @@
 			this.addFileButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.addFileButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.addFileButton.ForeColor = System.Drawing.Color.White;
-			this.addFileButton.Location = new System.Drawing.Point(372, 201);
+			this.addFileButton.Location = new System.Drawing.Point(384, 219);
 			this.addFileButton.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
 			this.addFileButton.Name = "addFileButton";
 			this.addFileButton.Size = new System.Drawing.Size(144, 37);
@@ -473,16 +486,17 @@
 			this.label10.TabIndex = 9;
 			this.label10.Text = "Win + D";
 			// 
-			// checkBoxShowDesktopSplash
+			// checkBoxHideNotifications
 			// 
-			this.checkBoxShowDesktopSplash.AutoSize = true;
-			this.checkBoxShowDesktopSplash.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.checkBoxShowDesktopSplash.Location = new System.Drawing.Point(197, 64);
-			this.checkBoxShowDesktopSplash.Name = "checkBoxShowDesktopSplash";
-			this.checkBoxShowDesktopSplash.Size = new System.Drawing.Size(151, 19);
-			this.checkBoxShowDesktopSplash.TabIndex = 9;
-			this.checkBoxShowDesktopSplash.Text = "Hide Desktop Splash?";
-			this.checkBoxShowDesktopSplash.UseVisualStyleBackColor = true;
+			this.checkBoxHideNotifications.AutoSize = true;
+			this.checkBoxHideNotifications.Font = new System.Drawing.Font("Roboto", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.checkBoxHideNotifications.Location = new System.Drawing.Point(9, 114);
+			this.checkBoxHideNotifications.Name = "checkBoxHideNotifications";
+			this.checkBoxHideNotifications.Size = new System.Drawing.Size(133, 19);
+			this.checkBoxHideNotifications.TabIndex = 10;
+			this.checkBoxHideNotifications.Text = "Hide Notifications?";
+			this.checkBoxHideNotifications.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			this.checkBoxHideNotifications.UseVisualStyleBackColor = true;
 			// 
 			// Settings
 			// 
@@ -496,6 +510,7 @@
 			this.ForeColor = System.Drawing.Color.Black;
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Margin = new System.Windows.Forms.Padding(1);
+			this.MaximumSize = new System.Drawing.Size(618, 500);
 			this.MinimumSize = new System.Drawing.Size(618, 500);
 			this.Name = "Settings";
 			this.ShowIcon = false;
@@ -521,7 +536,7 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox checkBoxAlternateKeys;
         private System.Windows.Forms.GroupBox groupBoxSettings;
         private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.PictureBox pictureBox1;
@@ -554,7 +569,8 @@
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label10;
-		private System.Windows.Forms.CheckBox checkBoxShowDesktopSplash;
+		private System.Windows.Forms.CheckBox checkBoxHideDesktopSplash;
+		private System.Windows.Forms.CheckBox checkBoxHideNotifications;
 	}
 }
 

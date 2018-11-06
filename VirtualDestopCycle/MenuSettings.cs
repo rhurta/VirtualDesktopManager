@@ -48,8 +48,6 @@ namespace VirtualDesktopManager
         private bool closeToTray;
         private bool useAltKeySettings;
 
-		private bool HideDesktopSplash;
-
 
         // APP STARTUP
 
@@ -83,10 +81,11 @@ namespace VirtualDesktopManager
 			this.FormClosing += MenuSettings_FormClosing;
 
 			useAltKeySettings = Properties.Settings.Default.AltHotKey;
-			checkBox1.Checked = useAltKeySettings;
+			checkBoxAlternateKeys.Checked = useAltKeySettings;
 
 			checkBoxAutomaticStartup.Checked = Properties.Settings.Default.ApplicationStartup;
-			checkBoxShowDesktopSplash.Checked = Properties.Settings.Default.HideDesktopSplash;
+			checkBoxHideDesktopSplash.Checked = Properties.Settings.Default.HideDesktopSplash;
+			checkBoxHideNotifications.Checked = Properties.Settings.Default.HideNotifications;
 
 			listView1.Items.Clear();
 			listView1.Columns.Add("File").Width = 400;
@@ -153,9 +152,12 @@ namespace VirtualDesktopManager
 				e.Cancel = true;
 				this.Visible = false;
 				this.ShowInTaskbar = false;
-				notifyIcon1.BalloonTipTitle = "Still Running...";
-				notifyIcon1.BalloonTipText = "Right-click on the tray icon to exit.";
-				notifyIcon1.ShowBalloonTip(2000);
+				if (!Properties.Settings.Default.HideNotifications)
+				{
+					notifyIcon1.BalloonTipTitle = "Still Running...";
+					notifyIcon1.BalloonTipText = "Right-click on the tray icon to exit.";
+					notifyIcon1.ShowBalloonTip(2000);
+				}
 			}
 		}
 
@@ -231,16 +233,16 @@ namespace VirtualDesktopManager
 			_rightHotkey.Unregister(Key.Right, System.Windows.Input.ModifierKeys.Shift | System.Windows.Input.ModifierKeys.Alt);
 			_leftHotkey.Unregister(Key.Left, System.Windows.Input.ModifierKeys.Shift | System.Windows.Input.ModifierKeys.Alt);
 
-			if (checkBox1.Checked)
-			{
-				alternateHotkeys();
-				Properties.Settings.Default.AltHotKey = true;
-			}
-			else
-			{
-				normalHotkeys();
-				Properties.Settings.Default.AltHotKey = false;
-			}
+			Properties.Settings.Default.AltHotKey = checkBoxAlternateKeys.Checked;
+			Properties.Settings.Default.HideDesktopSplash = checkBoxHideDesktopSplash.Checked;
+			Properties.Settings.Default.DesktopBackgroundFiles.Clear();
+			Properties.Settings.Default.ApplicationStartup = checkBoxAutomaticStartup.Checked;
+			Properties.Settings.Default.HideNotifications = checkBoxHideNotifications.Checked;
+
+			foreach (ListViewItem item in listView1.Items)
+				Properties.Settings.Default.DesktopBackgroundFiles.Add(item.Tag.ToString());
+
+			Properties.Settings.Default.Save();
 
 			if (checkBoxAutomaticStartup.Checked)
 			{
@@ -256,34 +258,19 @@ namespace VirtualDesktopManager
 					writer.WriteLine("IconFile=" + icon);
 					writer.Flush();
 				}
-				Properties.Settings.Default.ApplicationStartup = true;
 			}
 			else
 			{
 				string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
 				if (File.Exists(deskDir + "\\VirtualDesktopManager.url"))
 					File.Delete(deskDir + "\\VirtualDesktopManager.url");
-				Properties.Settings.Default.ApplicationStartup = false;
 			}
 
-			if (checkBoxShowDesktopSplash.Checked)
-			{
-				Properties.Settings.Default.HideDesktopSplash = true;
-				HideDesktopSplash = Properties.Settings.Default.HideDesktopSplash;
-			}
+			if (checkBoxAlternateKeys.Checked)
+				alternateHotkeys();
 			else
-			{
-				Properties.Settings.Default.HideDesktopSplash = false;
-				HideDesktopSplash = Properties.Settings.Default.HideDesktopSplash;
-			}
+				normalHotkeys();
 
-			Properties.Settings.Default.DesktopBackgroundFiles.Clear();
-			foreach (ListViewItem item in listView1.Items)
-			{
-				Properties.Settings.Default.DesktopBackgroundFiles.Add(item.Tag.ToString());
-			}
-
-			Properties.Settings.Default.Save();
 			labelStatus.Text = "Changes were successful.";
 		}
 
@@ -334,9 +321,6 @@ namespace VirtualDesktopManager
 
 		private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-
-			// Author: rootwo62
-
 			InitializeVariables();
 			InitializeToolStripItems();
 			PickNthFile(getCurrentDesktopIndex());
@@ -459,10 +443,12 @@ namespace VirtualDesktopManager
 
 		private void ShowDesktopSwitchedNotification()
 		{
-			
-			notifyIcon1.BalloonTipTitle = "Desktop Switched";
-			notifyIcon1.BalloonTipText = string.Format("Current Desktop is {0}", (getCurrentDesktopIndex() + 1));
-			notifyIcon1.ShowBalloonTip(0);
+			if (!Properties.Settings.Default.HideNotifications)
+			{
+				notifyIcon1.BalloonTipTitle = "Desktop Switched";
+				notifyIcon1.BalloonTipText = string.Format("Current Desktop is {0}", (getCurrentDesktopIndex() + 1));
+				notifyIcon1.ShowBalloonTip(0);
+			}
 		}
 
 		private void VirtualDesktop_Shortcuts()
@@ -519,14 +505,10 @@ namespace VirtualDesktopManager
 			var currentDesktopIndex = getCurrentDesktopIndex();
 
 			if (index == currentDesktopIndex)
-			{
 				return;
-			}
 
 			if (index > desktops.Count - 1)
-			{
 				return;
-			}
 
 			desktops.ElementAt(index)?.Switch();
 			ShowSplashVirtualDesktopSplashScreen();
@@ -556,9 +538,6 @@ namespace VirtualDesktopManager
 			catch (Exception err)
 			{
 				Console.WriteLine("[HOTKEY ERROR] {0}", err.Message);
-				//notifyIcon1.BalloonTipTitle = "Error setting hotkeys";
-				//notifyIcon1.BalloonTipText = "Could not set hotkeys. Please open settings and try the alternate combination.";
-				//notifyIcon1.ShowBalloonTip(2000);
 			}
 		}
 
@@ -573,9 +552,6 @@ namespace VirtualDesktopManager
 			catch (Exception err)
 			{
 				Console.WriteLine("[HOTKEY ERROR] {0}", err.Message);
-				//notifyIcon1.BalloonTipTitle = "Error setting hotkeys";
-				//notifyIcon1.BalloonTipText = "Could not set hotkeys. Please open settings and try the default combination.";
-				//notifyIcon1.ShowBalloonTip(2000);
 			}
 		}
 
@@ -664,44 +640,11 @@ namespace VirtualDesktopManager
 		Form currentVirtualDesktop(int vDesktopIndex)
         {
 
-            Font fontCurrentDesktop = new Font("Roboto", 24, FontStyle.Bold);
-            Font fontCurrentDesktopIndex = new Font("Roboto", 128, FontStyle.Bold);
+			var form = new SplashScreen();
 
-            Label labelCurrentDesktop = new Label();
-            labelCurrentDesktop.Text = string.Format("Desktop");
-            labelCurrentDesktop.Font = fontCurrentDesktop;
-            labelCurrentDesktop.TextAlign = ContentAlignment.MiddleCenter;
-            labelCurrentDesktop.AutoSize = false;
-            labelCurrentDesktop.Height = 50;
-            labelCurrentDesktop.ForeColor = Color.White;
-            labelCurrentDesktop.Dock = DockStyle.Top;
-
-
-			Label labelCurrentDesktopIndex = new Label();
-            labelCurrentDesktopIndex.Text = (vDesktopIndex + 1).ToString().Trim();
-            labelCurrentDesktopIndex.Font = fontCurrentDesktopIndex;
-            labelCurrentDesktopIndex.TextAlign = ContentAlignment.MiddleCenter;
-            labelCurrentDesktopIndex.AutoSize = false;
-			labelCurrentDesktopIndex.ForeColor = Color.White;
-            labelCurrentDesktopIndex.Dock = DockStyle.Fill;
-
-
-			TableLayoutPanel tpanel = new TableLayoutPanel();
-			tpanel.ColumnCount = 1;
-			tpanel.RowCount = 2;
-			tpanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-			tpanel.RowStyles.Add(new RowStyle(SizeType.Percent, 15F));
-			tpanel.RowStyles.Add(new RowStyle(SizeType.Percent, 75F));
-			tpanel.Controls.Add(labelCurrentDesktop);
-			tpanel.Controls.Add(labelCurrentDesktopIndex);
-			tpanel.Dock = DockStyle.Fill;
-
-			Form form = new Form();
-            form.StartPosition = FormStartPosition.CenterScreen;
-            form.Controls.Add(tpanel);
-            form.FormBorderStyle = FormBorderStyle.None;
+			form.StartPosition = FormStartPosition.CenterScreen;
+			form.labelNumber.Text = (vDesktopIndex + 1).ToString();
 			form.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, form.Width, form.Height, 20, 20));
-			form.BackColor = ColorTranslator.FromHtml("#212121");
             form.Opacity = .5;
 			form.ShowInTaskbar = false;
             form.TopMost = true;
@@ -710,7 +653,7 @@ namespace VirtualDesktopManager
 
 		private void ShowSplashVirtualDesktopSplashScreen()
 		{
-			if (!HideDesktopSplash)
+			if (!Properties.Settings.Default.HideDesktopSplash)
 			{
 				if (CurrentVirtualDesktopSplashScreen == null)
 				{
